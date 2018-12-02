@@ -95,6 +95,19 @@ def search_destination(graph, start, get_succsssors, is_goal_predicate, strategy
         seen.add(frontier)
     return chosen_pathes
 
+#加入经过路线的功能
+def search_destination_add_by_way(start,destination,by_way_stations):
+    path=[]
+    by_way_segment=[]
+    first_segment=search_destination(stations_connection_graph, start, get_succsssors,lambda n:n ==by_way_stations[0],shortest_path_priority)
+    first_segment.pop()
+    for i,by_way in enumerate(by_way_stations):
+        if i<=len(by_way_stations)-2:
+            by_way_segment+=search_destination(stations_connection_graph,by_way_stations[i], get_succsssors,lambda n:n ==by_way_stations[i+1],shortest_path_priority)
+            by_way_segment.pop()
+    last_segment=search_destination(stations_connection_graph,by_way_stations[-1],get_succsssors,lambda n:n==destination,shortest_path_priority)
+    return print(first_segment+by_way_segment+last_segment)
+
 def get_succsssors(froninter, graph):
     return graph[froninter]
 
@@ -153,11 +166,11 @@ nx.draw(stations_connection_graph,with_labels=True,node_size=30)
 #show()
 
 """
-by way 的方法因时间关系还未完成，完成最短距离、最少换乘、Astar方法
 """
 
-print(search_destination(stations_connection_graph,'首经贸站',get_succsssors, lambda n: n =='西二旗站',mininum_change_station))
-print(search_destination(stations_connection_graph,'首经贸站',get_succsssors, lambda n: n =='西二旗站',shortest_path_priority))
-print(search_destination(stations_connection_graph,'首经贸站',get_succsssors, lambda n: n =='西二旗站',comprehensive_sort))
+print("最少换乘方案\n{}\n\n".format(search_destination(stations_connection_graph,'首经贸站',get_succsssors, lambda n: n =='西二旗站',mininum_change_station)))
+print("最短路程方案\n{}\n\n".format(search_destination(stations_connection_graph,'首经贸站',get_succsssors, lambda n: n =='西二旗站',shortest_path_priority)))
+#print(search_destination(stations_connection_graph,'首经贸站',get_succsssors, lambda n: n =='西二旗站',comprehensive_sort))
 
-
+#加入中途站，作为第三个输入 Input:Start ,Destination,by_way
+search_destination_add_by_way("五道口站","张自忠路站",["望京站",'东四站',"芍药居站"])
